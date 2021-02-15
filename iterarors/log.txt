@@ -1,0 +1,1 @@
+Время вызова функции: 2021-02-15 16:30:15.148254, имя функции: function,параметры функции: ('countries.json',), {}, возвращаемое значение: <generator object generate_file_md5 at 0x034ECCA0>
