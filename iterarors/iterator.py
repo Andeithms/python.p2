@@ -1,40 +1,32 @@
-import requests
 import json
-from tqdm import tqdm
 
 
 class MyIterator:
 
     def __init__(self, file_path):
         self.file_path = file_path
-        self.country_list = []
         self.i = -1
-        with open(self.file_path) as f:
-            self.file = json.load(f)
 
     def __iter__(self):
         return self
 
     def __next__(self):
-        string = self.file
+        with open(self.file_path) as f:
+            self.string = json.load(f)
         self.i += 1
-        if string[self.i] is None:
+        if self.string[self.i] is None:
             raise StopIteration
-        return string[self.i]
-
-    def writer(self):
-        for country in tqdm(self.file):
-            country_url = {}
-            response = requests.get('https://en.wikipedia.org/wiki/' + country['name']['common']).url
-            country_url[country['name']['common']] = response
-            self.country_list.append(country_url)
-        with open('country_list.json', 'w', ) as cl:
-            json.dump(self.country_list, cl, indent=1)
-        return self.country_list
+        country_name = self.string[self.i]['name']['common']
+        country_link = ('https://en.wikipedia.org/wiki/' + country_name.replace(' ', '_'))
+        with open('country_list.txt', 'a', encoding="utf-8") as cl:
+            cl.write(f"{country_name}: {country_link}" '\n')
+        return self.string[self.i]
 
 
 if __name__ == '__main__':
-    test = MyIterator('countries.json').writer()
+    test = MyIterator('countries.json')
+    for i in test:
+        test.__next__()
 
 
 
