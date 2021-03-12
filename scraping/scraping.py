@@ -12,21 +12,25 @@ def get_articles():
     return all_article
 
 
-def searching(article, words):
-    for word in words:
-        item = []   # время - название - ссылка
-        if word in article.text:
-            name = article.find("a", class_="post__title_link").text
-            link = article.find("a", class_="post__title_link")['href']
-            time = article.find("span", class_="post__time").text
-            item.append(time)
-            item.append(name)
-            item.append(link)
-            print(item)
-            return item
+def searching(words):
+    articles = []
+    for art in get_articles():
+        for word in words:
+            item = []   # время - название - ссылка
+            if word in art.text:
+                name = art.find("a", class_="post__title_link").text
+                link = art.find("a", class_="post__title_link")['href']
+                time = art.find("span", class_="post__time").text
+                item.append(time)
+                item.append(name)
+                item.append(link)
+                articles.append(item)
+    if articles:
+        return articles
+    else:
+        return 'Статей по данным тегам не найдено'
 
 
 if __name__ == '__main__':
-    KEYWORDS = ['Дизайн', 'Фото', 'Web', 'Python', 'Программирование']  # теги должны быть с большой буквы
-    for art in get_articles():
-        searching(art, KEYWORDS)
+    KEYWORDS = ['Дизайн', 'Фото', 'Web', 'Python', 'Информационная безопасность']  # теги должны быть с большой буквы
+    print(searching(KEYWORDS))
