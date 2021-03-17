@@ -1,7 +1,7 @@
 import sqlalchemy
 import json
 
-PASSWORD = 'пароль'
+PASSWORD = ''
 
 
 def create_bd():
@@ -83,7 +83,8 @@ def get_data(name):     # для поиска повторов в основно
 
 
 if __name__ == '__main__':
-    create_bd()
+    # create_bd()
+    print(get_data('138723499'))
 
 
 
