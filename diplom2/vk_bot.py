@@ -57,8 +57,8 @@ class MyBot:
             return user_year
         except (KeyError, IndexError):
             server1.send_msg(self.user_id, 'Введите год рождения, например: 1990) ')
-            user_year = int(server1.listen()[1])
             while True:
+                user_year = int(server1.listen()[1])
                 if 1900 < user_year < 2100:
                     return user_year
                 else:
