@@ -86,8 +86,8 @@ class MyBot:
     def selection(self, name, info):
         """ выборка подходящих людей """
         vk = self.vk_session.get_api()
-        bdate = range(int(info[1]) - 5, int(info[1]) + 5)
-
+        age_from = 2021 - int(info[1]) - 5
+        age_to = 2021 - int(info[1]) + 5
         if info[2] == 1:  # противоположный пол
             unsex = 2
         else:
@@ -96,7 +96,8 @@ class MyBot:
         city_id = info[0]
         server1.send_msg(self.user_id, 'Начинаю поиск пары')
         response = vk.users.search(sex=unsex,
-                                   birth_year=bdate,
+                                   age_from=age_from,
+                                   age_to=age_to,
                                    city=city_id,
                                    status=6,
                                    has_photo=1,
