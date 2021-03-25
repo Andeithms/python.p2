@@ -1,36 +1,32 @@
 import sqlalchemy
 import json
-
-PASSWORD = ''
+from data.config import password_bd
 
 
 def create_bd():
-
     """ создание базы данных """
-
     try:
-        engine = sqlalchemy.create_engine(f"postgresql://postgres:{PASSWORD}@localhost:5432/postgres")
+        engine = sqlalchemy.create_engine(f"postgresql://postgres:{password_bd}@localhost:5432/postgres")
         connection = engine.connect()
         connection.execute('''COMMIT''')
         connection.execute('''CREATE DATABASE users''')
         create_tables()
-    except sqlalchemy.exc.ProgrammingError:
+    except (sqlalchemy.exc.ProgrammingError, sqlalchemy.exc.OperationalError):
         pass
 
 
 def get_connect():
-
     """ установка соединения с БД """
-
-    engine = sqlalchemy.create_engine(f'postgresql://postgres:{PASSWORD}@localhost:5432/users')
-    connection = engine.connect()
-    return connection
+    try:    # на случай недоступности бд
+        engine = sqlalchemy.create_engine(f'postgresql://postgres:{password_bd}@localhost:5432/users')
+        connection = engine.connect()
+        return connection
+    except sqlalchemy.exc.OperationalError:
+        return 'нет связи'
 
 
 def create_tables():
-
     """ создание таблиц """
-
     con = get_connect()
 
     con.execute('''CREATE TABLE IF NOT EXISTS Bots_user (
@@ -50,13 +46,13 @@ def create_tables():
 
 
 def insert_inf(name):   # name - имя пользователя запустившего бота
-
     """ заполнение базы данных """
-
     create_bd()    # создаст бд при первом обращении к ней
     with open('canditat.json', 'r') as f:
         doc = json.load(f)
     con = get_connect()
+    if con == 'нет связи':
+        return ''
     try:
         con.execute("INSERT INTO Bots_user (name) VALUES(%s)", (name,))
     except sqlalchemy.exc.IntegrityError:
@@ -75,15 +71,22 @@ def insert_inf(name):   # name - имя пользователя запусти�
                         (photo, vk_user_id[0]))
 
 
-def get_data(name):     # для поиска повторов в основном модуле
+def get_data(name):
+    """ Получение истории поиска"""
     con = get_connect()
+    history_list = []
+    if con == 'нет связи':
+        return history_list
     tup = con.execute("SELECT vk_id FROM User_vk_id uk JOIN Bots_user bu ON bot_user_id = bu.id WHERE name =  %s",
                       (name,)).fetchall()
-    return tup
+    for i in tup:
+        history_list.append(i[0])
+    return history_list
 
 
 if __name__ == '__main__':
     create_bd()
+
 
 
 

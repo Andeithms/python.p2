@@ -1,38 +1,29 @@
 from vk_bot import MyBot
-import json
-from pprint import pprint
+from group import server1
 
 
 def main():
-    login, password = '', ''
-    bot = MyBot(login, password)
-    user_id, user_info = bot.collect_info()
-
     while True:
-        candidat_list = bot.selection(user_id, user_info)
-        pages = bot.get_photo(candidat_list)
-        creating_json(pages)
-        bot.history(user_id)
-        print(' Возможные пары: ')
-        pprint(pages)
+        if server1.listen():
+            user_id, message = server1.listen()
+            server1.send_msg(user_id, 'Приветсвую!')
+            user_info = bot.collect_info(user_id)
+            working(user_id, user_info)
 
-        print('Желаете повторно вы полнить поиск?')
-        user_input = input(' да / нет ')
-        if user_input.lower() == ('да'):  # антикапс
-            pass
-        elif user_input.lower() == ('нет'):
-            break
+
+def working(user_id, user_info):
+    candidat_list = bot.selection(user_id, user_info)
+    pages = bot.get_photo(candidat_list)
+    bot.show_photo(pages)
+    server1.send_msg(user_id, 'Выполнить поиск еще раз?( да/нет )')
+    while True:
+        user_input = server1.listen()[1]
+        if user_input.lower() == ('да'):
+            working(user_id, user_info)
         else:
-            print('Пожалуйста либо русскими буквами да, либо нет')
-
-
-def creating_json(pages):
-
-    """ создание json-файла с кандитатми """
-
-    with open('canditat.json', 'w') as f:
-        json.dump(pages, f, indent=1)
+            main()
 
 
 if __name__ == '__main__':
+    bot = MyBot()
     main()
