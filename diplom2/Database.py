@@ -54,14 +54,14 @@ def insert_inf(name):   # name - имя пользователя запусти�
     if con == 'нет связи':
         return ''
     try:
-        con.execute("INSERT INTO Bots_user (name) VALUES(%s)", (name,))
+        con.execute("INSERT INTO Bots_user (name) VALUES(%s)", (str(name),))
     except sqlalchemy.exc.IntegrityError:
         pass
 
     for i, y in doc.items():
         id_vk = i.split('id')[1]     # будем записывать id предложенных страниц
         # переменная(кортеж) для связывания таблиц
-        bots_user_id = con.execute("SELECT id FROM Bots_user WHERE name =  %s", (name,)).fetchone()
+        bots_user_id = con.execute("SELECT id FROM Bots_user WHERE name =  %s", (str(name),)).fetchone()
         con.execute("INSERT INTO User_vk_id ( vk_id, bot_user_id) VALUES (%s, %s)",
                     (id_vk, bots_user_id[0]))
         for photo in y:
@@ -78,7 +78,7 @@ def get_data(name):
     if con == 'нет связи':
         return history_list
     tup = con.execute("SELECT vk_id FROM User_vk_id uk JOIN Bots_user bu ON bot_user_id = bu.id WHERE name =  %s",
-                      (name,)).fetchall()
+                      (str(name),)).fetchall()
     for i in tup:
         history_list.append(i[0])
     return history_list
